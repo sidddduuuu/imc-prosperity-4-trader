@@ -15,8 +15,11 @@ Backtest:
     /opt/anaconda3/bin/prosperity3bt trader.py 1 --no-out --merge-pnl --data data
 """
 
-from typing import List
-from prosperity3bt.datamodel import Order, OrderDepth, TradingState
+from typing import List, Dict
+try:
+    from datamodel import Order, OrderDepth, TradingState
+except ImportError:
+    from prosperity3bt.datamodel import Order, OrderDepth, TradingState
 
 POSITION_LIMIT = 50
 
@@ -26,7 +29,7 @@ ACO_SKEW = 0.0      # ticks of quote skew per unit of net inventory
 
 class Trader:
     def run(self, state: TradingState):
-        orders: dict[str, List[Order]] = {}
+        orders: Dict[str, List[Order]] = {}
 
         for product, order_depth in state.order_depths.items():
             pos = state.position.get(product, 0)
