@@ -23,7 +23,7 @@ except ImportError:
 
 POSITION_LIMIT = 50
 
-ACO_EDGE = 8         # half-spread to quote around fair value
+ACO_EDGE = 7         # half-spread to quote around fair value
 ACO_SKEW = 0.0      # ticks of quote skew per unit of net inventory
 
 
