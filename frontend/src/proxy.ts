@@ -7,8 +7,10 @@ function isPublicPath(pathname: string): boolean {
   if (pathname === "/") return true;
   if (pathname.startsWith("/auth")) return true;
   if (pathname === "/login") return true;
-  if (pathname === "/api/atlas/auth-status") return true;
+  // Atlas bridge routes must be reachable so the client can sync / detect Auth0
+  if (pathname.startsWith("/api/atlas/")) return true;
   if (pathname === "/api/health") return true;
+  if (pathname === "/api/auth/config") return true;
   // static / next internals already excluded by matcher
   return false;
 }

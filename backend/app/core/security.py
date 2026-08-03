@@ -17,6 +17,9 @@ from app.db.session import get_db
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
 
+# Sentinel for Auth0-only accounts — never a valid bcrypt hash, so local password login fails closed.
+AUTH0_PASSWORD_PLACEHOLDER = "!"
+
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -47,7 +50,12 @@ def get_user_by_auth0_sub(db: Session, sub: str) -> Optional[models.User]:
 
 def authenticate_user(db: Session, email: str, password: str) -> Optional[models.User]:
     user = get_user_by_email(db, email)
-    if not user or not verify_password(password, user.hashed_password):
+    if (
+        not user
+        or not user.hashed_password
+        or user.hashed_password == AUTH0_PASSWORD_PLACEHOLDER
+        or not verify_password(password, user.hashed_password)
+    ):
         return None
     return user
 
@@ -66,11 +74,14 @@ def upsert_auth0_user(
         user.email = email
         if name:
             user.name = name
+        # Older SQLite schemas still enforce NOT NULL on hashed_password
+        if not user.hashed_password:
+            user.hashed_password = AUTH0_PASSWORD_PLACEHOLDER
     else:
         user = models.User(
             email=email,
             name=name or email.split("@")[0],
-            hashed_password=None,
+            hashed_password=AUTH0_PASSWORD_PLACEHOLDER,
             auth0_sub=sub,
         )
         db.add(user)

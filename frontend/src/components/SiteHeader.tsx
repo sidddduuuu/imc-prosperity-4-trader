@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { useUser } from "@auth0/nextjs-auth0/client";
 import { useAuth } from "@/lib/auth";
 
 const links = [
@@ -26,8 +27,11 @@ const moreLinks = [
 export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const { user, logout, loading } = useAuth();
+  const { user: auth0User, isLoading: auth0Loading } = useUser();
+  const { logout } = useAuth();
   const isLanding = pathname === "/";
+  // Gate chrome on Auth0 session only — local JWT alone must not show terminal nav
+  const signedIn = Boolean(auth0User);
 
   return (
     <header className="sticky top-0 z-50 border-b border-ink/10 bg-paper/80 backdrop-blur-md">
@@ -42,7 +46,7 @@ export function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-5 xl:flex">
-          {user &&
+          {signedIn &&
             links.map((link) => {
               const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
               return (
@@ -57,7 +61,7 @@ export function SiteHeader() {
                 </Link>
               );
             })}
-          {user && (
+          {signedIn && (
             <details className="relative">
               <summary className="cursor-pointer list-none text-sm text-ink-muted hover:text-ink">
                 More
@@ -75,10 +79,10 @@ export function SiteHeader() {
               </div>
             </details>
           )}
-          {user ? (
+          {signedIn ? (
             <div className="flex items-center gap-3">
               <span className="max-w-[120px] truncate text-sm text-ink-muted">
-                {user.name || user.email}
+                {auth0User?.name || auth0User?.email}
               </span>
               <a
                 href="/auth/logout"
@@ -91,18 +95,18 @@ export function SiteHeader() {
                 Log out
               </a>
               <Link
-                href="/backtest"
+                href="/markets"
                 className="rounded-sm bg-ink px-4 py-2 text-sm text-paper transition hover:bg-ink-soft"
               >
-                Run strategy
+                Open terminal
               </Link>
             </div>
           ) : (
-            // On landing, hero CTA is enough — avoid duplicate Auth0 button
-            !loading &&
+            // Landing already has "Login to trade" — no duplicate Auth0 button there
+            !auth0Loading &&
             !isLanding && (
               <a
-                href={`/auth/login?returnTo=${encodeURIComponent(pathname)}`}
+                href={`/auth/login?returnTo=${encodeURIComponent(pathname === "/" ? "/markets" : pathname)}`}
                 className="rounded-sm bg-ink px-4 py-2 text-sm text-paper transition hover:bg-ink-soft"
               >
                 Log in
@@ -124,7 +128,7 @@ export function SiteHeader() {
       {open && (
         <div className="border-t border-ink/10 bg-paper px-5 py-4 xl:hidden">
           <div className="flex flex-col gap-3">
-            {user &&
+            {signedIn &&
               [...links, ...moreLinks].map((link) => (
                 <Link
                   key={link.href}
@@ -135,7 +139,7 @@ export function SiteHeader() {
                   {link.label}
                 </Link>
               ))}
-            {user ? (
+            {signedIn ? (
               <button
                 type="button"
                 onClick={() => {
@@ -149,7 +153,7 @@ export function SiteHeader() {
             ) : (
               !isLanding && (
                 <a
-                  href={`/auth/login?returnTo=${encodeURIComponent(pathname)}`}
+                  href={`/auth/login?returnTo=${encodeURIComponent(pathname === "/" ? "/markets" : pathname)}`}
                   onClick={() => setOpen(false)}
                   className="text-ink"
                 >

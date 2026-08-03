@@ -2,34 +2,37 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight, LineChart, Newspaper, Radar } from "lucide-react";
-import { useAuth } from "@/lib/auth";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 const features = [
   {
-    href: "/markets",
     title: "Strategy backtester",
     copy: "SMA, EMA, RSI, MACD, Bollinger, mean-reversion — plus walk-forward and Monte Carlo in the lab.",
     icon: Radar,
-    returnTo: "/backtest",
+    path: "/backtest",
   },
   {
-    href: "/markets",
     title: "Charts & screener",
     copy: "Candles, quotes, and a momentum/RSI/trend screener across the liquid universe.",
     icon: LineChart,
-    returnTo: "/markets",
+    path: "/markets",
   },
   {
-    href: "/markets",
     title: "Paper & alerts",
     copy: "Simulated trading desk, price alerts, watchlists, community strategies, and AI briefs.",
     icon: Newspaper,
-    returnTo: "/paper",
+    path: "/paper",
   },
 ];
 
+/** Always Auth0 first when logged out — never navigate to a protected page then bounce. */
+function authHref(path: string, signedIn: boolean) {
+  if (signedIn) return path;
+  return `/auth/login?returnTo=${encodeURIComponent(path)}`;
+}
+
 export default function HomePage() {
-  const { user, loading } = useAuth();
+  const { user, isLoading } = useUser();
   const signedIn = Boolean(user);
 
   return (
@@ -90,26 +93,25 @@ export default function HomePage() {
             transition={{ duration: 0.55, delay: 0.24 }}
             className="mt-10 flex flex-wrap gap-3"
           >
-            {!loading && (
-              <a
-                href={
-                  signedIn
-                    ? "/markets"
-                    : "/auth/login?returnTo=/markets"
-                }
-                className="inline-flex items-center gap-2 bg-ink px-6 py-3 text-sm text-paper transition hover:bg-ink-soft"
-              >
-                {signedIn ? (
-                  <>
-                    Open terminal <ArrowRight size={16} />
-                  </>
-                ) : (
-                  <>
-                    Sign in to trade <ArrowRight size={16} />
-                  </>
-                )}
-              </a>
-            )}
+            {/* Always render the CTA — default to Auth0 login until we know they're signed in */}
+            <a
+              href={
+                isLoading
+                  ? "/auth/login?returnTo=%2Fmarkets"
+                  : authHref("/markets", signedIn)
+              }
+              className="inline-flex items-center gap-2 bg-ink px-6 py-3 text-sm text-paper transition hover:bg-ink-soft"
+            >
+              {signedIn && !isLoading ? (
+                <>
+                  Open terminal <ArrowRight size={16} />
+                </>
+              ) : (
+                <>
+                  Login to trade <ArrowRight size={16} />
+                </>
+              )}
+            </a>
           </motion.div>
         </div>
       </section>
@@ -128,14 +130,7 @@ export default function HomePage() {
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.45, delay: i * 0.08 }}
             >
-              <a
-                href={
-                  signedIn
-                    ? f.returnTo
-                    : `/auth/login?returnTo=${encodeURIComponent(f.returnTo)}`
-                }
-                className="group block"
-              >
+              <a href={authHref(f.path, signedIn && !isLoading)} className="group block">
                 <f.icon className="text-signal" size={22} strokeWidth={1.75} />
                 <h3 className="mt-4 text-xl text-ink group-hover:text-signal">{f.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-muted">{f.copy}</p>
@@ -155,9 +150,7 @@ export default function HomePage() {
             </p>
           </div>
           <a
-            href={
-              signedIn ? "/backtest" : "/auth/login?returnTo=/backtest"
-            }
+            href={authHref("/backtest", signedIn && !isLoading)}
             className="inline-flex items-center gap-2 bg-signal px-6 py-3 text-sm text-paper transition hover:bg-signal-bright"
           >
             Start backtesting <ArrowRight size={16} />
