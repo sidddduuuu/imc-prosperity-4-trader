@@ -76,7 +76,7 @@ def fetch_quote(symbol: str) -> dict:
         "eps": _opt_float(info.get("trailingEps")),
         "fifty_two_week_high": _opt_float(info.get("fiftyTwoWeekHigh")),
         "fifty_two_week_low": _opt_float(info.get("fiftyTwoWeekLow")),
-        "dividend_yield": _opt_float(info.get("dividendYield")),
+        "dividend_yield": _dividend_yield(info),
         "sector": info.get("sector"),
         "industry": info.get("industry"),
         "currency": info.get("currency") or "USD",
@@ -149,3 +149,16 @@ def _opt_int(value) -> Optional[int]:
         return int(value)
     except (TypeError, ValueError):
         return None
+
+
+def _dividend_yield(info: dict) -> Optional[float]:
+    """Return dividend yield as a fraction (0.012 = 1.2%)."""
+    for key in ("trailingAnnualDividendYield", "yield", "dividendYield"):
+        raw = _opt_float(info.get(key))
+        if raw is None:
+            continue
+        # Some Yahoo fields arrive as percent points (e.g. 1.01 => 1.01%).
+        if key == "dividendYield" and raw > 0.2:
+            return round(raw / 100.0, 6)
+        return round(raw, 6)
+    return None
