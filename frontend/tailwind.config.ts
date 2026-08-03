@@ -9,18 +9,6 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
-        border: "var(--border)",
-        ring: "var(--ring)",
-        muted: {
-          DEFAULT: "var(--muted)",
-          foreground: "var(--muted-foreground)",
-        },
-        primary: {
-          DEFAULT: "var(--primary)",
-          foreground: "var(--primary-foreground)",
-        },
         ink: {
           DEFAULT: "#101418",
           soft: "#1C242C",

@@ -8,21 +8,6 @@
   --signal: #0c8f6a;
   --ink: #101418;
   --paper: #f2f4f1;
-  --radius: 0.25rem;
-  --border: rgba(16, 20, 24, 0.12);
-  --ring: rgba(12, 143, 106, 0.4);
-  --muted: #e8ece6;
-  --muted-foreground: #5a6672;
-  --primary: #101418;
-  --primary-foreground: #f2f4f1;
-  --card: #f2f4f1;
-  --card-foreground: #101418;
-  --popover: #f2f4f1;
-  --popover-foreground: #101418;
-  --accent: #e8ece6;
-  --accent-foreground: #101418;
-  --destructive: #c23b3b;
-  --input: rgba(16, 20, 24, 0.15);
 }
 
 * {
@@ -55,11 +40,5 @@ body {
       linear-gradient(to right, rgba(16, 20, 24, 0.04) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(16, 20, 24, 0.04) 1px, transparent 1px);
     background-size: 48px 48px;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
   }
 }
