@@ -16,6 +16,18 @@ SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, futu
 
 def init_db() -> None:
     Base.metadata.create_all(bind=engine)
+    _ensure_sqlite_columns()
+
+
+def _ensure_sqlite_columns() -> None:
+    """Light migration for SQLite when new columns are added."""
+    if not settings.database_url.startswith("sqlite"):
+        return
+    with engine.begin() as conn:
+        cols = {row[1] for row in conn.exec_driver_sql("PRAGMA table_info(users)").fetchall()}
+        if "auth0_sub" not in cols:
+            conn.exec_driver_sql("ALTER TABLE users ADD COLUMN auth0_sub VARCHAR(128)")
+        # hashed_password already exists; nullability is soft in SQLite
 
 
 def get_db() -> Generator[Session, None, None]:

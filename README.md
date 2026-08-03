@@ -12,10 +12,38 @@ Production-oriented stock analysis and strategy backtesting platform.
 - **Screener**, **community strategies**, AI desk briefs
 - Rate limiting, disclaimers, Docker / Render / Vercel deploy configs
 
+## Authentication (Auth0)
+
+Atlas uses **Auth0 Universal Login** via `@auth0/nextjs-auth0` (Auth0 for AI Agents / OIDC).
+
+1. Create a **Regular Web Application** in the [Auth0 Dashboard](https://manage.auth0.com/)
+2. Allowed Callback URLs: `http://localhost:3000/auth/callback`
+3. Allowed Logout URLs: `http://localhost:3000`
+4. Copy env vars into `frontend/.env.local` and `backend/.env` (see `.env.example`)
+
+```bash
+# generate AUTH0_SECRET
+openssl rand -hex 32
+```
+
+| Variable | Where |
+|----------|--------|
+| `AUTH0_DOMAIN` | frontend + backend (no `https://`) |
+| `AUTH0_CLIENT_ID` | frontend + backend |
+| `AUTH0_CLIENT_SECRET` | frontend |
+| `AUTH0_SECRET` | frontend (cookie encryption) |
+| `APP_BASE_URL` | frontend |
+| `AUTH0_AUDIENCE` | optional API identifier |
+
+Login flow: `/auth/login` → Auth0 → `/auth/callback` → Atlas syncs the ID token to `/api/auth/auth0` and issues an API session JWT for watchlists/paper/alerts.
+
+Without Auth0 env vars, local email/password auth remains available for development.
+
 ## Stack
 
 - Backend: FastAPI + SQLAlchemy (SQLite default, Postgres via `DATABASE_URL`) + yfinance
-- Frontend: Next.js + Tailwind + lightweight-charts + Recharts
+- Frontend: Next.js + Auth0 + Tailwind + lightweight-charts + Recharts
+- Auth: Auth0 OIDC (preferred) with local JWT fallback
 
 ## Run locally
 

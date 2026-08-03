@@ -19,6 +19,11 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60 * 24 * 7
     algorithm: str = "HS256"
 
+    # Auth0 (OIDC) — set these to enable Universal Login token verification
+    auth0_domain: str | None = None
+    auth0_audience: str | None = None
+    auth0_client_id: str | None = None
+
     database_url: str = f"sqlite:///{DATA_DIR / 'atlas.db'}"
     redis_url: str | None = None
     cors_origins: str = "*"

@@ -72,17 +72,25 @@ export function SiteHeader() {
             </div>
           </details>
           {user ? (
-            <button
-              type="button"
-              onClick={logout}
-              className="text-sm text-ink-muted hover:text-ink"
-            >
-              {user.name || "Account"} · Log out
-            </button>
+            <div className="flex items-center gap-3">
+              <span className="max-w-[120px] truncate text-sm text-ink-muted">
+                {user.name || user.email}
+              </span>
+              <a
+                href="/auth/logout"
+                onClick={(e) => {
+                  e.preventDefault();
+                  logout();
+                }}
+                className="text-sm text-ink-muted hover:text-ink"
+              >
+                Log out
+              </a>
+            </div>
           ) : (
-            <Link href="/login" className="text-sm text-ink-muted hover:text-ink">
+            <a href="/auth/login" className="text-sm text-ink-muted hover:text-ink">
               Log in
-            </Link>
+            </a>
           )}
           <Link
             href="/backtest"

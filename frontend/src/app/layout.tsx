@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, Syne, JetBrains_Mono } from "next/font/google";
+import { Auth0Provider } from "@auth0/nextjs-auth0/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { DisclaimerBanner } from "@/components/DisclaimerBanner";
 import { AuthProvider } from "@/lib/auth";
@@ -33,11 +34,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body className={`${display.variable} ${sans.variable} ${mono.variable} antialiased`}>
-        <AuthProvider>
-          <SiteHeader />
-          <main>{children}</main>
-          <DisclaimerBanner />
-        </AuthProvider>
+        <Auth0Provider>
+          <AuthProvider>
+            <SiteHeader />
+            <main>{children}</main>
+            <DisclaimerBanner />
+          </AuthProvider>
+        </Auth0Provider>
       </body>
     </html>
   );
