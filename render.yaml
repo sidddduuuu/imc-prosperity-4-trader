@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: atlas-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHONPATH
+        value: .
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        value: sqlite:///./data/atlas.db
+      - key: CORS_ORIGINS
+        value: https://atlas-markets.vercel.app,http://localhost:3000
+      - key: ENVIRONMENT
+        value: production

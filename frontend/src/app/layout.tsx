@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Manrope, Syne, JetBrains_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
+import { DisclaimerBanner } from "@/components/DisclaimerBanner";
+import { AuthProvider } from "@/lib/auth";
 import "./globals.css";
 
 const display = Syne({
@@ -24,15 +26,18 @@ const mono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Atlas — Every signal. One terminal.",
   description:
-    "Backtest trading strategies, chart equities, read market-moving news, and analyze stocks in one place.",
+    "Production trading terminal: backtest, charts, news, screener, paper trading, alerts, and research.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <body className={`${display.variable} ${sans.variable} ${mono.variable} antialiased`}>
-        <SiteHeader />
-        <main>{children}</main>
+        <AuthProvider>
+          <SiteHeader />
+          <main>{children}</main>
+          <DisclaimerBanner />
+        </AuthProvider>
       </body>
     </html>
   );

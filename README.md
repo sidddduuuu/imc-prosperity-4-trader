@@ -1,44 +1,57 @@
-# Atlas
+# Atlas Terminal
 
-All-in-one stock analysis and strategy backtesting platform.
-
-## Stack
-
-- **Backend**: FastAPI + pandas + yfinance — market data, news, technical analysis, backtester
-- **Frontend**: Next.js + Tailwind + lightweight-charts + Recharts
+Production-oriented stock analysis and strategy backtesting platform.
 
 ## Features
 
-- Strategy backtester (SMA/EMA crossover, RSI, MACD, Bollinger, mean reversion, buy & hold)
-- Equity curves vs buy & hold with Sharpe, Sortino, max drawdown, win rate, trade logs
-- Candlestick charts and live quotes
-- Market news feeds with ticker filter and simple sentiment
-- Technical analysis desk (RSI, MACD bias, trend, ATR, moving averages)
+- Charts, quotes, technical analysis, news wire
+- Strategy backtester + **portfolio backtests**
+- **Walk-forward** and **Monte Carlo** research lab
+- Auth, **watchlists**, **alerts**, **saved backtests**
+- **Paper trading** desk
+- **Screener**, **community strategies**, AI desk briefs
+- Rate limiting, disclaimers, Docker / Render / Vercel deploy configs
+
+## Stack
+
+- Backend: FastAPI + SQLAlchemy (SQLite default, Postgres via `DATABASE_URL`) + yfinance
+- Frontend: Next.js + Tailwind + lightweight-charts + Recharts
 
 ## Run locally
 
-### Backend
+```bash
+./scripts/dev.sh
+```
+
+Or separately:
 
 ```bash
+# backend
 cd backend
-python3 -m venv .venv
-source .venv/bin/activate
+python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+PYTHONPATH=. uvicorn app.main:app --reload --port 8000
+
+# frontend
+cd frontend && npm install && npm run dev
 ```
 
-### Frontend
+Open http://localhost:3000 — API docs at http://localhost:8000/docs
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+## Free deploy
 
-Open http://localhost:3000 — API calls are proxied to the backend via Next.js rewrites.
+1. **Backend** → [Render](https://render.com) free web service  
+   - Root: `backend`  
+   - Build: `pip install -r requirements.txt`  
+   - Start: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`  
+   - Env: `SECRET_KEY`, `PYTHONPATH=.`, `DATABASE_URL=sqlite:///./data/atlas.db`, `CORS_ORIGINS=*`
 
-API docs: http://localhost:8000/docs
+2. **Frontend** → [Vercel](https://vercel.com) Hobby  
+   - Root: `frontend`  
+   - Env: `API_URL=https://YOUR-RENDER-SERVICE.onrender.com`
+
+See `render.yaml`, `docker-compose.yml`, and `.env.example`.
 
 ## Note
 
-The original IMC Prosperity `trader.py` and `data/` folder are preserved unchanged.
+IMC Prosperity `trader.py` and `data/round1` are preserved. Atlas market data uses Yahoo/RSS for the free demo — use a licensed vendor before commercial use.

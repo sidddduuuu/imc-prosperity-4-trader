@@ -32,6 +32,7 @@ export default function AnalyzeSymbolPage() {
   const [candles, setCandles] = useState<Candle[]>([]);
   const [analysis, setAnalysis] = useState<AnalysisResponse | null>(null);
   const [news, setNews] = useState<NewsItem[]>([]);
+  const [brief, setBrief] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -41,17 +42,19 @@ export default function AnalyzeSymbolPage() {
       setLoading(true);
       setError(null);
       try {
-        const [q, h, a, n] = await Promise.all([
+        const [q, h, a, n, b] = await Promise.all([
           atlasApi.quote(symbol),
           atlasApi.history(symbol, "1y"),
           atlasApi.analysis(symbol, "1y"),
           atlasApi.news(symbol, 8),
+          atlasApi.aiBrief(symbol).catch(() => null),
         ]);
         if (cancelled) return;
         setQuote(q);
         setCandles(h.candles);
         setAnalysis(a);
         setNews(n);
+        setBrief(b?.brief || null);
       } catch (e) {
         if (!cancelled) setError(e instanceof Error ? e.message : "Analysis failed");
       } finally {
@@ -107,6 +110,13 @@ export default function AnalyzeSymbolPage() {
                     <div className="mt-1 text-lg capitalize text-ink">{value}</div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {brief && (
+              <div className="border border-ink/10 bg-paper/70 p-5">
+                <h2 className="text-sm uppercase tracking-[0.16em] text-ink-muted">Desk brief</h2>
+                <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-ink">{brief}</p>
               </div>
             )}
 

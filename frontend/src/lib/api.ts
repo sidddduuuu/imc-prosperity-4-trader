@@ -125,6 +125,17 @@ async function api<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json();
 }
 
+function authInit(token?: string | null, init?: RequestInit): RequestInit {
+  return {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(init?.headers || {}),
+    },
+  };
+}
+
 export const atlasApi = {
   strategies: () => api<StrategyInfo[]>("/api/strategies"),
   quote: (symbol: string) => api<Quote>(`/api/quote/${encodeURIComponent(symbol)}`),
@@ -158,6 +169,55 @@ export const atlasApi = {
       method: "POST",
       body: JSON.stringify(body),
     }),
+  config: () =>
+    api<{
+      disclaimer: string;
+      features: Record<string, boolean>;
+      market_data_provider: string;
+    }>("/api/auth/config"),
+  screener: (params: Record<string, string | number | undefined> = {}) => {
+    const qs = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => {
+      if (v !== undefined && v !== "") qs.set(k, String(v));
+    });
+    return api<Record<string, unknown>[]>(`/api/screener?${qs.toString()}`);
+  },
+  watchlists: (token: string) => api<any[]>("/api/watchlists", authInit(token)),
+  addWatch: (token: string, watchlistId: number, symbol: string) =>
+    api(`/api/watchlists/${watchlistId}/items`, authInit(token, {
+      method: "POST",
+      body: JSON.stringify({ symbol }),
+    })),
+  removeWatch: (token: string, watchlistId: number, itemId: number) =>
+    api(`/api/watchlists/${watchlistId}/items/${itemId}`, authInit(token, { method: "DELETE" })),
+  alerts: (token: string) => api<any[]>("/api/alerts", authInit(token)),
+  createAlert: (
+    token: string,
+    body: { symbol: string; condition: string; threshold: number; message?: string }
+  ) => api("/api/alerts", authInit(token, { method: "POST", body: JSON.stringify(body) })),
+  checkAlerts: (token: string) =>
+    api<{ triggered: any[] }>("/api/alerts/check", authInit(token, { method: "POST" })),
+  deleteAlert: (token: string, id: number) =>
+    api(`/api/alerts/${id}`, authInit(token, { method: "DELETE" })),
+  paper: (token: string) => api<any>("/api/paper", authInit(token)),
+  paperOrder: (token: string, body: { symbol: string; side: string; shares: number }) =>
+    api("/api/paper/order", authInit(token, { method: "POST", body: JSON.stringify(body) })),
+  paperReset: (token: string) =>
+    api("/api/paper/reset", authInit(token, { method: "POST" })),
+  saveBacktest: (token: string, body: any) =>
+    api("/api/saved-backtests", authInit(token, { method: "POST", body: JSON.stringify(body) })),
+  savedBacktests: (token: string) => api<any[]>("/api/saved-backtests", authInit(token)),
+  portfolioBacktest: (body: any) =>
+    api("/api/backtest/portfolio", { method: "POST", body: JSON.stringify(body) }),
+  advancedBacktest: (body: any) =>
+    api("/api/backtest/advanced", { method: "POST", body: JSON.stringify(body) }),
+  community: () => api<any[]>("/api/community/strategies"),
+  shareStrategy: (token: string, body: any) =>
+    api("/api/community/strategies", authInit(token, { method: "POST", body: JSON.stringify(body) })),
+  likeStrategy: (id: number) =>
+    api(`/api/community/strategies/${id}/like`, { method: "POST" }),
+  aiBrief: (symbol: string) =>
+    api<any>("/api/ai/brief", { method: "POST", body: JSON.stringify({ symbol, include_news: true }) }),
 };
 
 export function formatMoney(n: number, digits = 2) {

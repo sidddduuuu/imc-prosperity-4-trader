@@ -8,19 +8,19 @@ const features = [
   {
     href: "/backtest",
     title: "Strategy backtester",
-    copy: "Run SMA, EMA, RSI, MACD, Bollinger, and mean-reversion strategies with institutional-grade metrics.",
+    copy: "SMA, EMA, RSI, MACD, Bollinger, mean-reversion — plus walk-forward and Monte Carlo in the lab.",
     icon: Radar,
   },
   {
     href: "/markets",
-    title: "Live charts",
-    copy: "Candlestick charts across major equities and ETFs with a clean trading-desk view.",
+    title: "Charts & screener",
+    copy: "Candles, quotes, and a momentum/RSI/trend screener across the liquid universe.",
     icon: LineChart,
   },
   {
-    href: "/news",
-    title: "Market news",
-    copy: "Headlines as they hit — Yahoo, CNBC, MarketWatch — with quick sentiment cues.",
+    href: "/paper",
+    title: "Paper & alerts",
+    copy: "Simulated trading desk, price alerts, watchlists, community strategies, and AI briefs.",
     icon: Newspaper,
   },
 ];
