@@ -28,7 +28,6 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const { user, logout, loading } = useAuth();
   const isLanding = pathname === "/";
-  const showTerminalNav = Boolean(user) || !isLanding;
 
   return (
     <header className="sticky top-0 z-50 border-b border-ink/10 bg-paper/80 backdrop-blur-md">
@@ -43,8 +42,7 @@ export function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-5 xl:flex">
-          {showTerminalNav &&
-            user &&
+          {user &&
             links.map((link) => {
               const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
               return (
@@ -59,7 +57,7 @@ export function SiteHeader() {
                 </Link>
               );
             })}
-          {showTerminalNav && user && (
+          {user && (
             <details className="relative">
               <summary className="cursor-pointer list-none text-sm text-ink-muted hover:text-ink">
                 More
@@ -100,12 +98,14 @@ export function SiteHeader() {
               </Link>
             </div>
           ) : (
-            !loading && (
+            // On landing, hero CTA is enough — avoid duplicate Auth0 button
+            !loading &&
+            !isLanding && (
               <a
-                href={`/auth/login?returnTo=${encodeURIComponent(isLanding ? "/markets" : pathname)}`}
+                href={`/auth/login?returnTo=${encodeURIComponent(pathname)}`}
                 className="rounded-sm bg-ink px-4 py-2 text-sm text-paper transition hover:bg-ink-soft"
               >
-                Log in with Auth0
+                Log in
               </a>
             )
           )}
@@ -147,13 +147,15 @@ export function SiteHeader() {
                 Log out
               </button>
             ) : (
-              <a
-                href={`/auth/login?returnTo=${encodeURIComponent(isLanding ? "/markets" : pathname)}`}
-                onClick={() => setOpen(false)}
-                className="text-ink"
-              >
-                Log in with Auth0
-              </a>
+              !isLanding && (
+                <a
+                  href={`/auth/login?returnTo=${encodeURIComponent(pathname)}`}
+                  onClick={() => setOpen(false)}
+                  className="text-ink"
+                >
+                  Log in
+                </a>
+              )
             )}
           </div>
         </div>

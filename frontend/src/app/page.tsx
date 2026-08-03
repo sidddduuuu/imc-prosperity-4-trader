@@ -2,29 +2,36 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight, LineChart, Newspaper, Radar } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 
 const features = [
   {
-    href: "/backtest",
+    href: "/markets",
     title: "Strategy backtester",
     copy: "SMA, EMA, RSI, MACD, Bollinger, mean-reversion — plus walk-forward and Monte Carlo in the lab.",
     icon: Radar,
+    returnTo: "/backtest",
   },
   {
     href: "/markets",
     title: "Charts & screener",
     copy: "Candles, quotes, and a momentum/RSI/trend screener across the liquid universe.",
     icon: LineChart,
+    returnTo: "/markets",
   },
   {
-    href: "/paper",
+    href: "/markets",
     title: "Paper & alerts",
     copy: "Simulated trading desk, price alerts, watchlists, community strategies, and AI briefs.",
     icon: Newspaper,
+    returnTo: "/paper",
   },
 ];
 
 export default function HomePage() {
+  const { user, loading } = useAuth();
+  const signedIn = Boolean(user);
+
   return (
     <div>
       <section className="relative min-h-[88vh] overflow-hidden bg-mesh grid-fine">
@@ -83,18 +90,26 @@ export default function HomePage() {
             transition={{ duration: 0.55, delay: 0.24 }}
             className="mt-10 flex flex-wrap gap-3"
           >
-            <a
-              href="/auth/login?returnTo=/backtest"
-              className="inline-flex items-center gap-2 bg-ink px-6 py-3 text-sm text-paper transition hover:bg-ink-soft"
-            >
-              Sign in to trade <ArrowRight size={16} />
-            </a>
-            <a
-              href="/auth/login?returnTo=/markets"
-              className="inline-flex items-center gap-2 border border-ink/20 px-6 py-3 text-sm text-ink transition hover:border-ink/40"
-            >
-              Enter terminal
-            </a>
+            {!loading && (
+              <a
+                href={
+                  signedIn
+                    ? "/markets"
+                    : "/auth/login?returnTo=/markets"
+                }
+                className="inline-flex items-center gap-2 bg-ink px-6 py-3 text-sm text-paper transition hover:bg-ink-soft"
+              >
+                {signedIn ? (
+                  <>
+                    Open terminal <ArrowRight size={16} />
+                  </>
+                ) : (
+                  <>
+                    Sign in to trade <ArrowRight size={16} />
+                  </>
+                )}
+              </a>
+            )}
           </motion.div>
         </div>
       </section>
@@ -107,13 +122,20 @@ export default function HomePage() {
         <div className="mt-12 grid gap-10 md:grid-cols-3">
           {features.map((f, i) => (
             <motion.div
-              key={f.href}
+              key={f.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.45, delay: i * 0.08 }}
             >
-              <a href={`/auth/login?returnTo=${f.href}`} className="group block">
+              <a
+                href={
+                  signedIn
+                    ? f.returnTo
+                    : `/auth/login?returnTo=${encodeURIComponent(f.returnTo)}`
+                }
+                className="group block"
+              >
                 <f.icon className="text-signal" size={22} strokeWidth={1.75} />
                 <h3 className="mt-4 text-xl text-ink group-hover:text-signal">{f.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-muted">{f.copy}</p>
@@ -133,7 +155,9 @@ export default function HomePage() {
             </p>
           </div>
           <a
-            href="/auth/login?returnTo=/backtest"
+            href={
+              signedIn ? "/backtest" : "/auth/login?returnTo=/backtest"
+            }
             className="inline-flex items-center gap-2 bg-signal px-6 py-3 text-sm text-paper transition hover:bg-signal-bright"
           >
             Start backtesting <ArrowRight size={16} />
