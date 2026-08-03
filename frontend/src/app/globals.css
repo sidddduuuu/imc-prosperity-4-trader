@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f2f4f1;
+  --foreground: #101418;
+  --signal: #0c8f6a;
+  --ink: #101418;
+  --paper: #f2f4f1;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+::selection {
+  background: rgba(12, 143, 106, 0.22);
+  color: #101418;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .grid-fine {
+    background-image:
+      linear-gradient(to right, rgba(16, 20, 24, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(16, 20, 24, 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+}

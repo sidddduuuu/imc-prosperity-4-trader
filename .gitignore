@@ -1,4 +1,13 @@
 __pycache__/
 *.pyc
+.venv/
+venv/
 backtests/
 .DS_Store
+node_modules/
+frontend/.next/
+frontend/out/
+*.egg-info/
+.pytest_cache/
+.env
+.env.local
