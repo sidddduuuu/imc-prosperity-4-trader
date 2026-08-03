@@ -23,7 +23,7 @@ export function getAuth0(): Auth0Client {
         scope: "openid profile email offline_access",
         ...(process.env.AUTH0_AUDIENCE ? { audience: process.env.AUTH0_AUDIENCE } : {}),
       },
-      signInReturnToPath: "/watchlist",
+      signInReturnToPath: "/markets",
     });
   }
   return _client;

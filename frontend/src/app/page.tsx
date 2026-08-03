@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, LineChart, Newspaper, Radar } from "lucide-react";
 
@@ -84,18 +83,18 @@ export default function HomePage() {
             transition={{ duration: 0.55, delay: 0.24 }}
             className="mt-10 flex flex-wrap gap-3"
           >
-            <Link
-              href="/backtest"
+            <a
+              href="/auth/login?returnTo=/backtest"
               className="inline-flex items-center gap-2 bg-ink px-6 py-3 text-sm text-paper transition hover:bg-ink-soft"
             >
-              Open backtester <ArrowRight size={16} />
-            </Link>
-            <Link
-              href="/markets"
+              Sign in to trade <ArrowRight size={16} />
+            </a>
+            <a
+              href="/auth/login?returnTo=/markets"
               className="inline-flex items-center gap-2 border border-ink/20 px-6 py-3 text-sm text-ink transition hover:border-ink/40"
             >
-              Explore markets
-            </Link>
+              Enter terminal
+            </a>
           </motion.div>
         </div>
       </section>
@@ -114,11 +113,11 @@ export default function HomePage() {
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.45, delay: i * 0.08 }}
             >
-              <Link href={f.href} className="group block">
+              <a href={`/auth/login?returnTo=${f.href}`} className="group block">
                 <f.icon className="text-signal" size={22} strokeWidth={1.75} />
                 <h3 className="mt-4 text-xl text-ink group-hover:text-signal">{f.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-muted">{f.copy}</p>
-              </Link>
+              </a>
             </motion.div>
           ))}
         </div>
@@ -133,12 +132,12 @@ export default function HomePage() {
               logs in seconds.
             </p>
           </div>
-          <Link
-            href="/backtest"
+          <a
+            href="/auth/login?returnTo=/backtest"
             className="inline-flex items-center gap-2 bg-signal px-6 py-3 text-sm text-paper transition hover:bg-signal-bright"
           >
             Start backtesting <ArrowRight size={16} />
-          </Link>
+          </a>
         </div>
       </section>
 
