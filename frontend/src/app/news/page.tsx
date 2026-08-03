@@ -43,10 +43,11 @@ export default function NewsPage() {
           <div>
             <p className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">Wire</p>
             <h1 className="mt-2 font-display text-4xl tracking-tight text-ink md:text-5xl">
-              Market news
+              Trading news
             </h1>
             <p className="mt-3 max-w-xl text-ink-muted">
-              Headlines as they land — filter by ticker or browse the broad tape.
+              Markets, stocks, earnings, and macro that moves price — no lifestyle fluff.
+              Filter by ticker or browse the tape.
             </p>
           </div>
           <div className="w-full max-w-sm">
