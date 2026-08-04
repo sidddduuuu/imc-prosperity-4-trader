@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "backtester": "prosperity3bt 0.12.0",
+  "days": [
+    {
+      "round": 1,
+      "day": -2,
+      "final_pnl": 61044.5,
+      "max_drawdown": 952.0,
+      "limit_violations": 0,
+      "products": {
+        "ASH_COATED_OSMIUM": {
+          "final_pnl": 12256.5,
+          "max_drawdown": 483.0,
+          "fill_count": 334,
+          "traded_volume": 1765,
+          "max_abs_position": 34,
+          "final_position": 3
+        },
+        "INTARIAN_PEPPER_ROOT": {
+          "final_pnl": 48788.0,
+          "max_drawdown": 850.0,
+          "fill_count": 54,
+          "traded_volume": 100,
+          "max_abs_position": 50,
+          "final_position": 0
+        }
+      }
+    },
+    {
+      "round": 1,
+      "day": -1,
+      "final_pnl": 61143.0,
+      "max_drawdown": 1019.0,
+      "limit_violations": 0,
+      "products": {
+        "ASH_COATED_OSMIUM": {
+          "final_pnl": 12415.0,
+          "max_drawdown": 546.0,
+          "fill_count": 319,
+          "traded_volume": 1706,
+          "max_abs_position": 29,
+          "final_position": 10
+        },
+        "INTARIAN_PEPPER_ROOT": {
+          "final_pnl": 48728.0,
+          "max_drawdown": 950.0,
+          "fill_count": 54,
+          "traded_volume": 100,
+          "max_abs_position": 50,
+          "final_position": 0
+        }
+      }
+    },
+    {
+      "round": 1,
+      "day": 0,
+      "final_pnl": 60656.0,
+      "max_drawdown": 999.5,
+      "limit_violations": 0,
+      "products": {
+        "ASH_COATED_OSMIUM": {
+          "final_pnl": 11986.0,
+          "max_drawdown": 532.0,
+          "fill_count": 321,
+          "traded_volume": 1728,
+          "max_abs_position": 32,
+          "final_position": -12
+        },
+        "INTARIAN_PEPPER_ROOT": {
+          "final_pnl": 48670.0,
+          "max_drawdown": 1000.0,
+          "fill_count": 55,
+          "traded_volume": 100,
+          "max_abs_position": 50,
+          "final_position": 0
+        }
+      }
+    }
+  ],
+  "summary": {
+    "final_pnl": 182843.5,
+    "max_day_drawdown": 1019.0,
+    "limit_violations": 0
+  }
+}

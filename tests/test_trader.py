@@ -56,6 +56,7 @@ def test_memory_round_trip_is_versioned_and_bounded():
     memory = StrategyMemory(
         [10_000.0 + index for index in range(ACO_HISTORY_LENGTH + 5)],
         [[index * 100, 12_000.0 + index] for index in range(IPR_HISTORY_LENGTH + 5)],
+        50,
     )
 
     raw = memory.encode()
@@ -64,6 +65,7 @@ def test_memory_round_trip_is_versioned_and_bounded():
     assert json.loads(raw)["v"] == 1
     assert len(decoded.aco_fair_values) == ACO_HISTORY_LENGTH
     assert len(decoded.ipr_observations) == IPR_HISTORY_LENGTH
+    assert decoded.ipr_target == 50
     assert len(raw) < 1_500
 
 
@@ -97,7 +99,7 @@ def test_aco_sweeps_profitable_levels_then_posts_non_marketable_quote():
             asks={9_990: -10, 9_993: -15, 10_010: -20},
         ),
         0,
-        StrategyMemory([10_000.0], []),
+        StrategyMemory([10_000.0] * ACO_HISTORY_LENGTH, []),
     )
 
     buys = [order for order in orders if order.quantity > 0]
@@ -177,6 +179,12 @@ def test_ipr_target_tapers_to_flat_at_end_of_session():
     assert trader._ipr_target_position(0.1, 500_000, 20) == 50
     assert 0 < trader._ipr_target_position(0.1, 990_000, 20) < 50
     assert trader._ipr_target_position(0.1, 999_900, 20) == 0
+
+
+def test_ipr_target_uses_hysteresis_to_avoid_churn():
+    trader = Trader()
+    assert trader._ipr_target_position(0.0, 500_000, 20, previous_target=50) == 50
+    assert trader._ipr_target_position(-0.02, 500_000, 20, previous_target=50) == -25
 
 
 def test_validator_clips_invalid_duplicate_and_excess_orders():

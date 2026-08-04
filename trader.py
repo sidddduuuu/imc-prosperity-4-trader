@@ -39,7 +39,7 @@ PRODUCTS: Dict[str, ProductConfig] = {
         position_limit=50,
         max_order_size=50,
         edge=7,
-        inventory_skew=0.16,
+        inventory_skew=0.08,
     ),
     IPR: ProductConfig(
         symbol=IPR,
@@ -54,10 +54,11 @@ PRODUCTS: Dict[str, ProductConfig] = {
 class StrategyMemory:
     aco_fair_values: List[float]
     ipr_observations: List[List[float]]
+    ipr_target: int = 0
 
     @classmethod
     def empty(cls) -> "StrategyMemory":
-        return cls([], [])
+        return cls([], [], 0)
 
     @classmethod
     def decode(cls, raw: str) -> "StrategyMemory":
@@ -87,7 +88,10 @@ class StrategyMemory:
                 ):
                     ipr.append([int(item[0]), float(item[1])])
 
-            return cls(aco, ipr)
+            target = payload.get("target", 0)
+            if not isinstance(target, int) or isinstance(target, bool) or target < -50 or target > 50:
+                target = 0
+            return cls(aco, ipr, target)
         except (AttributeError, TypeError, ValueError, json.JSONDecodeError):
             return cls.empty()
 
@@ -99,6 +103,7 @@ class StrategyMemory:
                 [int(timestamp), round(value, 3)]
                 for timestamp, value in self.ipr_observations[-IPR_HISTORY_LENGTH:]
             ],
+            "target": self.ipr_target,
         }
         return json.dumps(payload, separators=(",", ":"), sort_keys=True)
 
@@ -245,7 +250,14 @@ class Trader:
     ) -> List[Order]:
         config = PRODUCTS[IPR]
         reference, slope = self._ipr_signal(order_depth, timestamp, memory)
-        target = self._ipr_target_position(slope, timestamp, len(memory.ipr_observations))
+        target = self._ipr_target_position(
+            slope,
+            timestamp,
+            len(memory.ipr_observations),
+            memory.ipr_target,
+        )
+        if timestamp < IPR_TAPER_START_TIMESTAMP:
+            memory.ipr_target = target
         delta = target - position
         orders: List[Order] = []
 
@@ -326,15 +338,20 @@ class Trader:
         slope: Optional[float],
         timestamp: int,
         observation_count: int,
+        previous_target: int = 0,
     ) -> int:
         if slope is None or observation_count < IPR_MIN_SIGNAL_POINTS:
             target = 0
         elif slope >= 0.04:
             target = 50
+        elif previous_target > 0 and slope > -0.015:
+            target = previous_target
         elif slope >= 0.015:
             target = 25
         elif slope <= -0.04:
             target = -50
+        elif previous_target < 0 and slope < 0.015:
+            target = previous_target
         elif slope <= -0.015:
             target = -25
         else:

@@ -2,7 +2,7 @@
 name = "imc-prosperity-4-trader"
 version = "0.1.0"
 description = "Risk-bounded Round 1 strategy for IMC Prosperity 4"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 
 [tool.pytest.ini_options]
 addopts = "-q"
