@@ -17,7 +17,7 @@ from prosperity3bt.models import BacktestResult, TradeMatchingMode
 from prosperity3bt.runner import run_backtest
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
-DAY_PATTERN = re.compile(r"prices_round_(?P<round>\\d+)_day_(?P<day>-?\\d+)\\.csv$")
+DAY_PATTERN = re.compile(r"prices_round_(?P<round>\d+)_day_(?P<day>-?\d+)\.csv$")
 PRODUCT_LIMITS = {
     "ASH_COATED_OSMIUM": 50,
     "INTARIAN_PEPPER_ROOT": 50,
@@ -75,13 +75,19 @@ def maximum_drawdown(values: Iterable[float]) -> float:
 
 def summarize_result(result: BacktestResult) -> Dict[str, Any]:
     pnl_by_product: Dict[str, List[float]] = defaultdict(list)
-    pnl_by_timestamp: Dict[int, float] = defaultdict(float)
+    pnl_by_timestamp_and_product: Dict[int, Dict[str, float]] = defaultdict(dict)
     for row in result.activity_logs:
         timestamp = int(row.columns[1])
         product = str(row.columns[2])
         pnl = float(row.columns[-1])
+        mid_price = float(row.columns[-2])
+        # Empty snapshots in the provided files use a synthetic zero mid. The
+        # simulator consequently marks open inventory at zero for that row,
+        # creating a fake six-figure drawdown. Retain only observable marks.
+        if mid_price <= 0:
+            continue
         pnl_by_product[product].append(pnl)
-        pnl_by_timestamp[timestamp] += pnl
+        pnl_by_timestamp_and_product[timestamp][product] = pnl
 
     fill_count: Dict[str, int] = defaultdict(int)
     traded_volume: Dict[str, int] = defaultdict(int)
@@ -117,7 +123,11 @@ def summarize_result(result: BacktestResult) -> Dict[str, Any]:
         for row in result.sandbox_logs
         if "exceeded limit" in row.sandbox_log
     ]
-    aggregate_values = [pnl_by_timestamp[key] for key in sorted(pnl_by_timestamp)]
+    latest_pnl: Dict[str, float] = {}
+    aggregate_values = []
+    for timestamp in sorted(pnl_by_timestamp_and_product):
+        latest_pnl.update(pnl_by_timestamp_and_product[timestamp])
+        aggregate_values.append(sum(latest_pnl.values()))
     return {
         "round": result.round_num,
         "day": result.day_num,

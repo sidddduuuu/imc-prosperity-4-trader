@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "results": [
+    {
+      "inventory_skew": 0.0,
+      "aggregate_pnl": 186290.0,
+      "max_day_drawdown": 1350.0,
+      "aco_pnl": 40104.0,
+      "aco_max_abs_position": 50
+    },
+    {
+      "inventory_skew": 0.04,
+      "aggregate_pnl": 184721.0,
+      "max_day_drawdown": 1060.0,
+      "aco_pnl": 38535.0,
+      "aco_max_abs_position": 50
+    },
+    {
+      "inventory_skew": 0.08,
+      "aggregate_pnl": 182843.5,
+      "max_day_drawdown": 1019.0,
+      "aco_pnl": 36657.5,
+      "aco_max_abs_position": 34
+    },
+    {
+      "inventory_skew": 0.12,
+      "aggregate_pnl": 181367.5,
+      "max_day_drawdown": 1033.0,
+      "aco_pnl": 35181.5,
+      "aco_max_abs_position": 32
+    },
+    {
+      "inventory_skew": 0.16,
+      "aggregate_pnl": 179954.0,
+      "max_day_drawdown": 1012.0,
+      "aco_pnl": 33768.0,
+      "aco_max_abs_position": 30
+    },
+    {
+      "inventory_skew": 0.2,
+      "aggregate_pnl": 178630.5,
+      "max_day_drawdown": 998.0,
+      "aco_pnl": 32444.5,
+      "aco_max_abs_position": 25
+    }
+  ]
+}
